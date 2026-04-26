@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8" />
+
+<title>Snake Game</title>
+
+<style>
+
+body {
+
+display: flex;
+
+justify-content: center;
+
+align-items: center;
+
+height: 100vh;
+
+background-color: #222;
+
+margin: 0;
+
+}
+
+
+#gameCanvas {
+
+border: 2px solid white;
+
+background-color: black;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+
+<script>
+
+const canvas = document.getElementById("gameCanvas");
+
+const ctx = canvas.getContext("2d");
+
+
+const box = 20;
+
+let snake = [{ x: 200, y: 200 }];
+
+let direction = "RIGHT";
+
+let food = spawnFood();
+
+let score = 0;
+
+let gameStarted = false;
+
+
+document.addEventListener("keydown", function (event) {
+
+if (
+
+!gameStarted &&
+
+["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"].includes(event.key)
+
+) {
+
+gameStarted = true;
+
+direction = event.key.replace("Arrow", "").toUpperCase();
+
+startGame();
+
+} else {
+
+changeDirection(event);
+
+}
+
+});
+
+
+function drawStartScreen() {
+
+ctx.fillStyle = "#000";
+
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+ctx.fillStyle = "lime";
+
+ctx.font = "30px Arial";
+
+ctx.textAlign = "center";
+
+ctx.fillText("Snake Game", canvas.width / 2, canvas.height / 2 - 30);
+
+
+ctx.fillStyle = "white";
+
+ctx.font = "20px Arial";
+
+ctx.fillText(
+
+"Press Any Arrow Key to Start",
+
+canvas.width / 2,
+
+canvas.height / 2 + 10
+
+);
+
+}
+
+
+function startGame() {
+
+setInterval(draw, 200);
+
+}
+
+
+function changeDirection(event) {
+
+if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+
+if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+
+if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+
+if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+
+}
+
+
+function spawnFood() {
+
+return {
+
+x: Math.floor(Math.random() * (canvas.width / box)) * box,
+
+y: Math.floor(Math.random() * (canvas.height / box)) * box,
+
+};
+
+}
+
+
+function draw() {
+
+ctx.fillStyle = "#000";
+
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+for (let i = 0; i < snake.length; i++) {
+
+ctx.fillStyle = i === 0 ? "lime" : "white";
+
+ctx.fillRect(snake[i].x, snake[i].y, box, box);
+
+ctx.strokeStyle = "black";
+
+ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+
+}
+
+
+ctx.fillStyle = "red";
+
+ctx.fillRect(food.x, food.y, box, box);
+
+
+let head = { x: snake[0].x, y: snake[0].y };
+
+if (direction === "LEFT") head.x -= box;
+
+if (direction === "RIGHT") head.x += box;
+
+if (direction === "UP") head.y -= box;
+
+if (direction === "DOWN") head.y += box;
+
+
+if (head.x === food.x && head.y === food.y) {
+
+score++;
+
+food = spawnFood();
+
+} else {
+
+snake.pop();
+
+}
+
+
+if (
+
+head.x < 0 ||
+
+head.x >= canvas.width ||
+
+head.y < 0 ||
+
+head.y >= canvas.height
+
+) {
+
+gameOver();
+
+}
+
+
+for (let i = 1; i < snake.length; i++) {
+
+if (head.x === snake[i].x && head.y === snake[i].y) {
+
+gameOver();
+
+}
+
+}
+
+
+snake.unshift(head);
+
+
+ctx.fillStyle = "white";
+
+ctx.font = "20px Arial";
+
+ctx.fillText("Score: " + score, 10, 20);
+
+}
+
+
+function gameOver() {
+
+clearInterval();
+
+alert("Game Over! Your Score: " + score);
+
+document.location.reload();
+
+}
+
+
+// Draw the start screen
+
+drawStartScreen();
+
+</script>
+
+</body>
+
+</html>
